@@ -1,8 +1,32 @@
-node_modules/
 build/
 dist/
 coverage/
-.DS_Store
-*.log
-.env*
+
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Env
+.env
+.env.*
 !.env.example
+
+# Node
+node_modules/
+.next/
+
+# Logs
+*.log
+
+# Database
+*.db
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
