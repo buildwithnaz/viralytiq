@@ -1,0 +1,17 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+pydantic-settings==2.7.0
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.30.0
+psycopg[binary]==3.2.3
+pgvector==0.3.6
+alembic==1.14.0
+langchain==0.3.14
+langchain-core==0.3.29
+langchain-groq==0.2.3
+langchain-text-splitters==0.3.5
+langgraph==0.2.62
+langfuse==2.57.11
+groq==0.15.0
+httpx==0.28.1

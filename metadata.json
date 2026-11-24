@@ -1,0 +1,6 @@
+{
+  "name": "Viralytiq",
+  "description": "AI-powered Personal Content Strategist for LinkedIn creators featuring LangGraph multi-agent workflows, pgvector voice RAG, and creator growth analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

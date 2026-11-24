@@ -1,0 +1,8 @@
+{
+  "/analytics/page": "app/analytics/page.js",
+  "/content/page": "app/content/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/memory/page": "app/memory/page.js",
+  "/settings/page": "app/settings/page.js",
+  "/traces/page": "app/traces/page.js"
+}

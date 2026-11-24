@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+html,
+body {
+  min-height: 100%;
+  background: #050816;
+}
+
+body {
+  color: white;
+  background:
+    radial-gradient(circle at top left, rgba(124,58,237,.25), transparent 35%),
+    radial-gradient(circle at top right, rgba(59,130,246,.20), transparent 35%),
+    #050816;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.glass-surface {
+  background: rgba(255,255,255,.05);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 8px 32px rgba(0,0,0,.3);
+}
+
+.glass-sidebar {
+  background: rgba(8,11,23,.7);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-right: 1px solid rgba(255,255,255,.08);
+}
+
+/* Dark-themed native selects / options */
+select,
+select.dark-select {
+  background-color: #0b1020;
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color-scheme: dark;
+}
+
+select option,
+select.dark-select option {
+  background-color: #0b1020;
+  color: #e2e8f0;
+}
+
+input,
+textarea {
+  color-scheme: dark;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(124,58,237,.18), transparent 35%),
+    radial-gradient(circle at 85% 15%, rgba(59,130,246,.15), transparent 35%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+  pointer-events: none;
+  z-index: -1;
+}
