@@ -30,6 +30,52 @@ The platform supports:
 
 ## Features
 
+## Features
+
+### Content Ideation
+
+Generate multiple content angles and LinkedIn topic ideas from a single prompt.
+
+### Content Studio
+
+Convert ideas into complete LinkedIn drafts with:
+
+- Hooks
+- Story-driven structure
+- Calls to action
+- Virality scoring
+
+### Brand Memory
+
+Store and retrieve:
+
+- Personal writing samples
+- Past LinkedIn posts
+- Competitor content
+- Industry research
+- Audience insights
+- Case studies
+- Generated drafts
+
+Built on PostgreSQL + pgvector semantic search.
+
+### Semantic Search
+
+Retrieve relevant content from Brand Memory using vector similarity search.
+
+### Analytics
+
+Track:
+
+- Generated drafts
+- Virality scores
+- Draft history
+- Content activity
+
+### Agent Traces
+
+Inspect workflow execution and strategist reasoning.
+
 ### Content Strategy Engine
 
 Generate content ideas from:
