@@ -21,39 +21,48 @@ type Doc = {
 };
 
 const CATEGORIES = [
-  'My LinkedIn Style',
-  'Competitor Style',
-  'Past Viral Post',
-  'Voice Guideline',
-  'ICP Research',
-  'Case Proof',
-  'Generated Draft',
+  'Personal Writing Style',
+  'Competitor Content',
+  'Past Successful Posts',
+  'Audience Research',
+  'Case Studies',
+  'Content Ideas',
+  'Generated Drafts',
 ] as const;
 
 export default function MemoryPage() {
   const [docs, setDocs] = React.useState<Doc[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+
   const [title, setTitle] = React.useState('');
   const [category, setCategory] =
-    React.useState<(typeof CATEGORIES)[number]>('My LinkedIn Style');
+    React.useState<(typeof CATEGORIES)[number]>('Personal Writing Style');
+
   const [content, setContent] = React.useState('');
   const [sourceUrl, setSourceUrl] = React.useState('');
   const [saving, setSaving] = React.useState(false);
+
   const [query, setQuery] = React.useState('');
+
   const [searchHits, setSearchHits] = React.useState<
-    Array<{ docTitle?: string; excerpt?: string; similarity?: number }>
+    Array<{
+      docTitle?: string;
+      excerpt?: string;
+      similarity?: number;
+    }>
   >([]);
 
   const load = React.useCallback(async () => {
     setLoading(true);
     setError(null);
+
     try {
       const data = await fetchVoiceDocuments();
       setDocs(Array.isArray(data) ? data : []);
     } catch {
       setError(
-        'Could not load Brand Memory from the API. Start Postgres + FastAPI to index style samples.'
+        'Could not load Brand Memory from the API. Ensure PostgreSQL and FastAPI are running.'
       );
       setDocs([]);
     } finally {
@@ -67,28 +76,38 @@ export default function MemoryPage() {
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!title.trim() || content.trim().length < 20) {
-      setError('Title required; paste at least ~20 characters of writing samples.');
+      setError(
+        'Please provide a title and at least 20 characters of content.'
+      );
       return;
     }
+
     setSaving(true);
     setError(null);
+
     try {
       const body = sourceUrl.trim()
         ? `Source: ${sourceUrl.trim()}\n\n${content.trim()}`
         : content.trim();
+
       await createVoiceDocument({
         title: title.trim(),
         category,
         content: body,
         sourceUrl: sourceUrl.trim() || undefined,
       });
+
       setTitle('');
       setContent('');
       setSourceUrl('');
+
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to index document.');
+      setError(
+        err instanceof Error ? err.message : 'Failed to save to Brand Memory.'
+      );
     } finally {
       setSaving(false);
     }
@@ -97,6 +116,7 @@ export default function MemoryPage() {
   const handleDelete = async (id: string) => {
     try {
       await deleteVoiceDocument(id);
+
       setDocs((prev) => prev.filter((d) => d.id !== id));
     } catch {
       setError('Delete failed.');
@@ -105,25 +125,32 @@ export default function MemoryPage() {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (query.trim().length < 2) return;
+
     try {
       const hits = await searchVoiceMemory(query.trim());
+
       setSearchHits(Array.isArray(hits) ? hits : []);
     } catch {
       setSearchHits([]);
-      setError('Semantic search failed (is pgvector + backend up?).');
+      setError('Brand Memory search failed.');
     }
   };
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold md:text-4xl">Brand Memory</h1>
+        <h1 className="text-3xl font-bold md:text-4xl">
+          Brand Memory
+        </h1>
+
         <p className="mt-2 max-w-3xl text-slate-400">
-          This is your <span className="text-slate-200">Voice RAG</span> store — not a post
-          archive by itself. Paste your own LinkedIn posts (or a competitor&apos;s public
-          writing) so the strategist can match tone, structure, and phrasing. Content Studio
-          can also push finished drafts here with &quot;Save to Brand Memory&quot;.
+          Build your <span className="text-slate-200">Brand Memory</span> by
+          storing personal writing samples, competitor content, audience
+          research, case studies, content ideas, and high-performing posts.
+          Viralytiq uses this knowledge base to retrieve context and generate
+          more relevant, consistent, and strategic content.
         </p>
       </div>
 
@@ -135,24 +162,30 @@ export default function MemoryPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
-          <h2 className="mb-2 text-xl font-semibold">Add style / knowledge source</h2>
+          <h2 className="mb-2 text-xl font-semibold">
+            Add Knowledge Source
+          </h2>
+
           <p className="mb-4 text-xs text-slate-500">
-            Optional LinkedIn profile or post URL for reference. Paste the actual writing
-            sample in the box (APIs cannot scrape LinkedIn for you).
+            Add writing samples, competitor content, audience research,
+            case studies, or content ideas to enrich your Brand Memory.
           </p>
+
           <form onSubmit={handleAdd} className="space-y-4">
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. My top 10 posts · Competitor: Jane Doe style"
+              placeholder="e.g. SaaS founder content style, Customer research, AI trends report"
               className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 outline-none focus:border-indigo-500/50"
             />
+
             <input
               value={sourceUrl}
               onChange={(e) => setSourceUrl(e.target.value)}
-              placeholder="LinkedIn profile or post URL (optional)"
+              placeholder="Reference URL (optional)"
               className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 outline-none focus:border-indigo-500/50"
             />
+
             <select
               value={category}
               onChange={(e) =>
@@ -166,50 +199,67 @@ export default function MemoryPage() {
                 </option>
               ))}
             </select>
+
             <textarea
               rows={7}
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Paste several posts or excerpts so the model can learn cadence, hooks, and vocabulary…"
+              placeholder="Paste writing samples, audience insights, competitor posts, case studies, research notes, or content ideas..."
               className="w-full rounded-2xl border border-white/10 bg-white/5 p-4 outline-none focus:border-indigo-500/50"
             />
+
             <Button type="submit" disabled={saving}>
-              {saving ? 'Indexing…' : 'Index into Voice RAG'}
+              {saving ? 'Saving…' : 'Save to Brand Memory'}
             </Button>
           </form>
         </Card>
 
         <Card>
-          <h2 className="mb-4 text-xl font-semibold">Semantic search</h2>
-          <form onSubmit={handleSearch} className="mb-4 flex gap-2">
+          <h2 className="mb-4 text-xl font-semibold">
+            Semantic Search
+          </h2>
+
+          <form
+            onSubmit={handleSearch}
+            className="mb-4 flex gap-2"
+          >
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Query voice memory…"
+              placeholder="Search Brand Memory..."
               className="min-w-0 flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 outline-none focus:border-indigo-500/50"
             />
+
             <Button type="submit" variant="glass">
               Search
             </Button>
           </form>
+
           <ul className="space-y-3">
             {searchHits.length === 0 && (
-              <li className="text-sm text-slate-500">No hits yet.</li>
+              <li className="text-sm text-slate-500">
+                No matching results yet.
+              </li>
             )}
+
             {searchHits.map((h, i) => (
               <li
                 key={i}
                 className="rounded-xl border border-white/8 bg-white/5 p-3 text-sm"
               >
                 <p className="font-medium text-slate-200">
-                  {h.docTitle ?? 'Chunk'}
+                  {h.docTitle ?? 'Result'}
+
                   {typeof h.similarity === 'number' && (
                     <span className="ml-2 text-xs text-indigo-300">
-                      sim {(h.similarity * 100).toFixed(0)}%
+                      Match {(h.similarity * 100).toFixed(0)}%
                     </span>
                   )}
                 </p>
-                <p className="mt-1 line-clamp-3 text-slate-400">{h.excerpt}</p>
+
+                <p className="mt-1 line-clamp-3 text-slate-400">
+                  {h.excerpt}
+                </p>
               </li>
             ))}
           </ul>
@@ -218,12 +268,14 @@ export default function MemoryPage() {
 
       <Card>
         <h2 className="mb-4 text-xl font-semibold">
-          Indexed sources {loading ? '(loading…)' : `(${docs.length})`}
+          Indexed Sources {loading ? '(loading...)' : `(${docs.length})`}
         </h2>
+
         {docs.length === 0 && !loading ? (
           <p className="text-slate-400">
-            Empty memory. Add your posts, competitor samples, or save drafts from Content
-            Studio so RAG can ground future generations.
+            Brand Memory is empty. Add personal writing samples,
+            competitor content, audience research, case studies, or save
+            drafts from Content Studio to improve future content generation.
           </p>
         ) : (
           <ul className="space-y-3">
@@ -233,14 +285,23 @@ export default function MemoryPage() {
                 className="flex flex-col gap-2 rounded-xl border border-white/8 bg-white/5 p-4 sm:flex-row sm:items-start sm:justify-between"
               >
                 <div className="min-w-0">
-                  <p className="font-medium text-white">{d.title}</p>
+                  <p className="font-medium text-white">
+                    {d.title}
+                  </p>
+
                   <p className="text-xs text-slate-500">
                     {d.category}
-                    {d.tokenCount != null ? ` · ~${d.tokenCount} tokens` : ''}
+                    {d.tokenCount != null
+                      ? ` · ~${d.tokenCount} tokens`
+                      : ''}
                     {d.createdAt ? ` · ${d.createdAt}` : ''}
                   </p>
-                  <p className="mt-2 line-clamp-2 text-sm text-slate-400">{d.content}</p>
+
+                  <p className="mt-2 line-clamp-2 text-sm text-slate-400">
+                    {d.content}
+                  </p>
                 </div>
+
                 <Button
                   type="button"
                   variant="glass"
