@@ -1,174 +1,165 @@
-<div align="center">
+# Viralytiq v2.0.0
 
-# Viralytiq
+AI Content Strategist powered by FastAPI, LangGraph, Groq, Supabase, and pgvector.
 
-### AI-Powered Content Strategist for LinkedIn Creators & Professionals
-
-Generate high-performing LinkedIn content using AI, brand memory, semantic search, and strategic content frameworks.
-
-</div>
+Viralytiq is a production-deployed AI content generation platform that combines Retrieval-Augmented Generation (RAG), multi-agent orchestration, creator voice memory, semantic search, analytics, and agent traces into a single workflow designed for LinkedIn content creation.
 
 ---
 
-## Overview
+## Live Demo
 
-Viralytiq is an AI content strategy platform that helps professionals create consistent, high-quality LinkedIn content.
+### Frontend
+https://viralytiq.vercel.app
 
-Instead of generating generic AI posts, Viralytiq builds a reusable brand memory layer that learns writing style, positioning, and content patterns to generate more authentic content.
-
-The platform supports:
-
-- Idea generation
-- Content expansion
-- Voice & style memory
-- Semantic search
-- Brand knowledge retrieval
-- AI-powered content workflows
-- Agent traces and observability (in progress)
+### Backend API
+https://viralytiq-api.onrender.com/docs
 
 ---
 
-## Features
+## Key Features
 
-## Features
+### Multi-Agent Content Generation
 
-### Content Ideation
+Viralytiq uses a specialized multi-agent workflow to generate high-quality LinkedIn content.
 
-Generate multiple content angles and LinkedIn topic ideas from a single prompt.
+Agents include:
 
-### Content Studio
+1. Audience & Signal Researcher
+2. Voice RAG Retriever
+3. Hook & Narrative Strategist
+4. Virality & Anti-Slop Critic
 
-Convert ideas into complete LinkedIn drafts with:
+Each agent performs a specific task before passing context to the next stage.
 
-- Hooks
-- Story-driven structure
-- Calls to action
-- Virality scoring
+---
 
 ### Brand Memory
 
-Store and retrieve:
+Store creator knowledge and writing style inside PostgreSQL + pgvector.
 
-- Personal writing samples
-- Past LinkedIn posts
-- Competitor content
-- Industry research
-- Audience insights
-- Case studies
-- Generated drafts
+Capabilities:
 
-Built on PostgreSQL + pgvector semantic search.
+- Long-term creator memory
+- Semantic search
+- Similarity retrieval
+- Voice consistency
+- Context-aware content generation
 
-### Semantic Search
+---
 
-Retrieve relevant content from Brand Memory using vector similarity search.
+### Retrieval-Augmented Generation (RAG)
 
-### Analytics
+Viralytiq retrieves relevant creator memory before content generation.
 
-Track:
+Pipeline:
 
-- Generated drafts
-- Virality scores
-- Draft history
-- Content activity
+```text
+Creator Memory
+    ↓
+Embeddings
+    ↓
+pgvector Search
+    ↓
+Relevant Chunks
+    ↓
+Content Generation
+```
+
+Benefits:
+
+- Personalized outputs
+- Reduced hallucinations
+- Higher content consistency
+- Reusable creator knowledge
+
+---
 
 ### Agent Traces
 
-Inspect workflow execution and strategist reasoning.
+Every workflow execution produces structured trace information.
 
-### Content Strategy Engine
+Tracks:
 
-Generate content ideas from:
+- Agent steps
+- Execution order
+- RAG retrieval
+- Token usage
+- Latency metrics
+- Trace identifiers
 
-- Personal experiences
-- Technical insights
-- Industry trends
-- Customer stories
-- Failure analysis
-- Contrarian viewpoints
+Example Workflow:
 
----
-
-### Content Studio
-
-Convert ideas into complete LinkedIn drafts.
-
-Features:
-
-- Hook generation
-- Long-form post creation
-- Content refinement
-- Strategic storytelling structures
-
----
-
-### Brand Memory (Voice RAG)
-
-Store writing samples and content references to build a personalized knowledge base.
-
-Features:
-
-- Writing style storage
-- Competitor style analysis
-- Semantic retrieval
-- Vector search
-- Voice consistency
+```text
+Research Agent
+    ↓
+Voice RAG Retrieval
+    ↓
+Content Generation
+    ↓
+Quality Critique
+```
 
 ---
 
 ### Analytics Dashboard
 
-Track:
+Track generated content and workflow performance.
 
-- Content generation activity
-- Draft quality metrics
-- Strategy usage
+Includes:
+
+- Draft counts
+- Virality scoring
+- API generated posts
+- Local session drafts
+- Historical content tracking
 
 ---
 
-### Agent Trace Viewer
+### Semantic Search
 
-Observe AI workflow execution:
+Query stored creator memory using pgvector similarity search.
 
-- Prompt flow
-- Retrieval events
-- LLM calls
-- Validation steps
+Example:
+
+```text
+"How do I write technical LinkedIn posts?"
+```
+
+returns semantically relevant memory documents instead of exact keyword matches.
 
 ---
 
 ## Architecture
 
 ```text
-                    ┌─────────────┐
-                    │   Frontend  │
-                    │  Next.js    │
-                    └──────┬──────┘
-                           │
-                           ▼
-                    ┌─────────────┐
-                    │  FastAPI    │
-                    │  Backend    │
-                    └──────┬──────┘
-                           │
-         ┌─────────────────┼─────────────────┐
-         │                 │                 │
-         ▼                 ▼                 ▼
-
-   Content Engine    Brand Memory      Analytics
-
-         │
-         ▼
-
-   Embeddings Layer
-         │
-         ▼
-
-     Vector Store
-         │
-         ▼
-
- Semantic Retrieval
+┌────────────────────────────┐
+│        Next.js UI          │
+│        (Vercel)            │
+└─────────────┬──────────────┘
+              │
+              ▼
+┌────────────────────────────┐
+│       FastAPI API          │
+│        (Render)            │
+└─────────────┬──────────────┘
+              │
+              ▼
+┌────────────────────────────┐
+│      LangGraph Agents      │
+└─────────────┬──────────────┘
+              │
+     ┌────────┴────────┐
+     ▼                 ▼
+┌───────────┐   ┌─────────────┐
+│   Groq    │   │ Brand Memory│
+│   LLMs    │   │  pgvector   │
+└───────────┘   └─────────────┘
+                        │
+                        ▼
+               ┌─────────────────┐
+               │ PostgreSQL      │
+               │ Supabase        │
+               └─────────────────┘
 ```
 
 ---
@@ -185,52 +176,78 @@ Observe AI workflow execution:
 ### Backend
 
 - FastAPI
+- LangGraph
+- LangChain
 - Python
-- Pydantic
 
-### AI Stack
+### AI
 
 - Groq
-- Google Gemini
-- Embeddings
-- RAG Pipeline
+- GPT-OSS-120B
+- Llama 3.1
 
-### Data Layer
+### Data & Storage
 
 - PostgreSQL
-- Vector Storage
-- Semantic Search
+- Supabase
+- pgvector
+
+### Infrastructure
+
+- Vercel
+- Render
+
+### Observability
+
+- Langfuse-ready trace integration
+- Agent execution traces
+- Workflow telemetry
 
 ---
 
-## Screenshots
+## Database Schema
 
-### Overview Dashboard
+Key tables:
 
-![Overview](docs/screenshots/overview.png)
+```text
+agent_runs
+alembic_version
+creator_profiles
+linkedin_posts
+voice_chunks
+voice_documents
+```
 
-### Brand Memory
+Capabilities:
 
-![Brand Memory](docs/screenshots/brand-memory.png)
+- Creator memory
+- Semantic retrieval
+- Stored generations
+- Trace persistence
 
-### Content Studio
+---
 
-![Content Studio](docs/screenshots/content-studio.png)
+## Example Workflow
+
+```text
+Topic Input
+      ↓
+Audience Research
+      ↓
+Retrieve Creator Voice
+      ↓
+Generate LinkedIn Draft
+      ↓
+Critique & Refinement
+      ↓
+Save Analytics & Traces
+```
 
 ---
 
 ## Local Development
 
-### Prerequisites
-
-- Python 3.11+
-- Node.js 20+
-- PostgreSQL
-- Docker (optional)
-
----
-
-### Backend Setup
+### Backend
 
 ```bash
 cd backend
@@ -238,24 +255,13 @@ cd backend
 python -m venv .venv
 
 source .venv/bin/activate
-# Windows
-.venv\Scripts\activate
+# Windows:
+# .venv\Scripts\activate
 
 pip install -r requirements.txt
-```
 
-Create:
+alembic upgrade head
 
-```env
-GROQ_API_KEY=
-GEMINI_API_KEY=
-DATABASE_URL=
-EMBEDDING_API_KEY=
-```
-
-Run:
-
-```bash
 uvicorn app.main:app --reload
 ```
 
@@ -265,7 +271,7 @@ Backend:
 http://localhost:8000
 ```
 
-Swagger Docs:
+API Docs:
 
 ```text
 http://localhost:8000/docs
@@ -273,12 +279,13 @@ http://localhost:8000/docs
 
 ---
 
-### Frontend Setup
+### Frontend
 
 ```bash
 cd frontend
 
 npm install
+
 npm run dev
 ```
 
@@ -290,52 +297,110 @@ http://localhost:3000
 
 ---
 
-## Roadmap
+## Environment Variables
 
-### Completed
+Backend:
 
-- [x] Idea Generation
-- [x] Content Studio
-- [x] LinkedIn Draft Expansion
-- [x] Multi-page Dashboard
-- [x] FastAPI Backend
-- [x] Modern UI
+```env
+DATABASE_URL=
+SYNC_DATABASE_URL=
 
-### In Progress
+GROQ_API_KEY=
 
-- [ ] Brand Memory Persistence
-- [ ] Vector Indexing
-- [ ] Semantic Search
-- [ ] Content-to-Memory Sync
-- [ ] Agent Tracing
+LANGFUSE_PUBLIC_KEY=
+LANGFUSE_SECRET_KEY=
+LANGFUSE_HOST=https://cloud.langfuse.com
+```
 
-### Planned
+Frontend:
 
-- [ ] Evaluation Framework
-- [ ] Content Scoring
-- [ ] Multi-Model Support
-- [ ] Analytics Improvements
-- [ ] Export to LinkedIn
+```env
+NEXT_PUBLIC_API_URL=
+```
 
 ---
 
-## Why I Built This
+## Production Deployment
 
-Most AI writing tools generate generic content.
+### Frontend
 
-Viralytiq focuses on helping creators build a consistent personal brand by combining content strategy, retrieval-augmented generation (RAG), semantic memory, and AI-powered drafting workflows.
+- Vercel
 
-This project is being developed as a demonstration of modern AI engineering concepts including:
+### Backend
 
-- LLM Applications
-- RAG
-- Embeddings
+- Render
+
+### Database
+
+- Supabase PostgreSQL
+
+### Vector Search
+
+- pgvector
+
+---
+
+## Changelog
+
+### v2.0.0
+
+Production Launch
+
+Features shipped:
+
+- Public deployment
+- Multi-agent generation workflow
+- Supabase integration
+- PostgreSQL persistence
+- pgvector semantic search
+- Brand Memory
+- Analytics Dashboard
+- Agent Traces
+- Creator Voice RAG
 - Semantic Search
-- Agent Workflows
-- Observability
-- FastAPI
-- Next.js
+- Production-ready infrastructure
+- FastAPI API
+- Next.js Frontend
+
+### v1.0.0
+
+Initial MVP release
+
+- Local-first workflow
+- Basic strategist generation
+- LangGraph pipeline
+- Initial UI
+
+---
+
+## Future Roadmap
+
+### v2.1
+
+- Real Langfuse cloud observability
+- Trace drill-down views
+- Cost analytics
+
+### v2.2
+
+- LinkedIn post scheduling
+- Multi-account creator profiles
+
+### v3.0
+
+- Multi-platform publishing
+- X/Twitter support
+- Blog generation
+- YouTube script generation
 
 ---
 
 ## License
+
+MIT License
+
+Copyright (c) 2026 Nazimuddin Borbora
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software.
+
+See the LICENSE file for full details.
