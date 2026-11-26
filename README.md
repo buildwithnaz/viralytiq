@@ -7,14 +7,8 @@ AI-powered LinkedIn content strategy platform that combines multi-agent workflow
 Frontend:
 https://viralytiq.vercel.app/
 
-Backend API:
-https://viralytiq-api.onrender.com/
-
 API Documentation:
 https://viralytiq-api.onrender.com/docs
-
-OpenAPI Schema:
-https://viralytiq-api.onrender.com/openapi.json
 
 ---
 
