@@ -12,6 +12,6 @@ langchain-core==0.3.29
 langchain-groq==0.2.3
 langchain-text-splitters==0.3.5
 langgraph==0.2.62
-langfuse==2.57.11
+langfuse>=3.0.0
 groq==0.15.0
 httpx==0.28.1

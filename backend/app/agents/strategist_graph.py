@@ -9,7 +9,13 @@ from langgraph.graph import END, StateGraph
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
-from app.core.observability import build_langfuse_callback
+from app.core.observability import (build_langfuse_callback, get_langfuse_client)
+try:
+    from langfuse import propagate_attributes
+except ImportError:
+    propagate_attributes = None
+
+
 from app.schemas.strategist import StrategyGenerationRequest
 from app.services.rag_service import search_voice_chunks
 
@@ -64,12 +70,20 @@ async def run_strategist_langgraph(
     req: StrategyGenerationRequest,
     session_id: str = "default-session",
 ) -> dict[str, Any]:
-    langfuse_handler = build_langfuse_callback(
-        trace_name="viralytiq_linkedin_strategist",
-        user_id=req.creatorId or "creator-elena",
-        session_id=session_id,
-    )
+    langfuse_handler = build_langfuse_callback()
+
     callbacks = [langfuse_handler] if langfuse_handler else []
+
+    langfuse_client = get_langfuse_client()
+
+    user_id = req.creatorId or "anonymous"
+
+    tags = [
+        "viralytiq",
+        "langgraph",
+        "groq",
+        "linkedin",
+    ]
 
     async def research_trends(state: StrategistState) -> dict[str, Any]:
         t0 = time.perf_counter()
@@ -267,17 +281,53 @@ async def run_strategist_langgraph(
     graph.add_edge("critique_and_refine", END)
 
     compiled = graph.compile()
-    final_state = await compiled.ainvoke(
-        {
-            "request": req.model_dump(),
-            "audience_angles": "",
-            "rag_chunks": [],
-            "draft_json": {},
-            "critique_score": 88,
-            "traces": [],
-        }
-    )
 
+    invoke_config = {
+        "callbacks": callbacks,
+        "run_name": "viralytiq-strategist-run",
+        "metadata": {
+            "langfuse_session_id": session_id,
+            "langfuse_user_id": user_id,
+        },
+    }
+
+    initial_state = {
+        "request": req.model_dump(),
+        "audience_angles": "",
+        "rag_chunks": [],
+        "draft_json": {},
+        "critique_score": 88,
+        "traces": [],
+    }
+
+    if propagate_attributes is not None and langfuse_handler is not None:
+        with propagate_attributes(
+            trace_name="viralytiq_linkedin_strategist",
+            user_id=user_id,
+            session_id=session_id,
+            tags=tags,
+            metadata={
+                "creator_id": req.creatorId or "anonymous",
+                "topic": req.topic,
+                "pillar": req.pillar,
+            },
+        ):
+            final_state = await compiled.ainvoke(
+                initial_state,
+                config=invoke_config,
+            )
+    else:
+        final_state = await compiled.ainvoke(
+            initial_state,
+            config=invoke_config,
+        )
+
+    if langfuse_client is not None:
+        try:
+            langfuse_client.flush()
+        except Exception:
+            pass
+    
     draft = final_state["draft_json"] or {}
     rag_sources = list({c["docTitle"] for c in final_state["rag_chunks"]})
     trace_id = None
