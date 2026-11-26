@@ -372,10 +372,36 @@ Initial MVP release
 - Initial UI
 
 ---
+## 🚀 Viralytiq v2.1.0
 
+### Added
+- Langfuse observability integration
+- LangGraph workflow tracing
+- Session-level metadata tracking
+- User-level trace attribution
+- Automatic trace flushing
+
+### Improved
+- End-to-end AI workflow visibility
+- Agent execution debugging
+- Monitoring of strategist pipeline
+
+### Verified
+- Brand Memory RAG
+- pgvector semantic search
+- Voice retrieval pipeline
+- LinkedIn content generation
+- Supabase PostgreSQL
+- Render backend deployment
+- Vercel frontend deployment
+
+### Repository Cleanup
+- Removed tracked Python cache files
+- Improved .gitignore rules
+---
 ## Future Roadmap
 
-### v2.1
+### v2.1 -- completed
 
 - Real Langfuse cloud observability
 - Trace drill-down views
